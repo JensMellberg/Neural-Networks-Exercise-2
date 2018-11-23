@@ -64,7 +64,7 @@ C_tst = C_matrix_test
 # Give the dimension of the data and chose the number of hidden layer
 n_in = 300
 n_out = 26
-n_hidden = 100
+n_hidden = 125
 
 # Set the variables
 W_hid = tf.Variable(rd.randn(n_in,n_hidden) / np.sqrt(n_in),trainable=True)
@@ -130,10 +130,13 @@ train_loss_list = []
 test_acc_list = []
 train_acc_list = []
 
-# Create minibtaches to train faster
+# Create minibatches to train faster
 k_batch = 40
 X_batch_list = np.array_split(X,k_batch)
 labels_batch_list = np.array_split(C,k_batch)
+train_acc_final=0
+test_acc_final=0
+epochs=0
 
 for k in range(50):
     # Run gradient steps over each minibatch
@@ -147,6 +150,10 @@ for k in range(50):
     # Compute the acc over the whole dataset
     train_acc = sess.run(accuracy, feed_dict={x:X, z_:C})
     test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
+    if test_acc > test_acc_final:
+        train_acc_final=train_acc
+        test_acc_final=test_acc
+        epochs=k
 
     # Put it into the lists
     test_loss_list.append(test_loss)
@@ -160,6 +167,12 @@ for k in range(50):
 
 # In[25]:
 
+print("Training error")
+print(train_acc_final)
+print("Validation error")
+print(test_acc_final)
+print("Epochs")
+print(epochs)
 
 fig,ax_list = plt.subplots(1,2)
 ax_list[0].plot(train_loss_list, color='blue', label='training', lw=2)
