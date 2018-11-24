@@ -35,11 +35,11 @@ from tensorflow.examples.tutorials.mnist import input_data
 #print(np.mean(X[1,:]))
 #print(np.std(X[1,:]))
 #
-#for i in range(X.shape[0]):
-#    mean = np.mean(X[i,:])
-#    std = np.std(X[i,:])
-#    for f in range(X.shape[1]):
-#        X[i,f] = (X[i,f] - mean)/std
+for i in range(X.shape[0]):
+    mean = np.mean(X[i,:])
+    std = np.std(X[i,:])
+    for f in range(X.shape[1]):
+        X[i,f] = (X[i,f] - mean)/std
 #print(np.std(X[1,:]))
 #print(np.std(X[5,:]))
 #print(X[1,:])
@@ -59,12 +59,24 @@ C_tst = C_matrix_test
 # - x is a matrix and not a vector, is has shape [None,784]. The first dimension correspond to a **batch size**. Multiplying larger matrices is usually faster that multiplying small ones many times, using minibatches allows to process many images in a single matrix multiplication.
 
 # In[3]:
+final = False
+if len(sys.argv) > 1 and sys.argv[1] == "final":
+    final = True
+
+if not final:
+    Val_set = X[0:1247,:]
+    Val_set_tar = C[0:1247,:]
+
+    X = X[1247:,:]
+    C = C[1247:,:]
+
 
 
 # Give the dimension of the data and chose the number of hidden layer
 n_in = 300
 n_out = 26
-n_hidden = 125
+n_hidden = 220
+learning_rate = 0.3
 
 # Set the variables
 W_hid = tf.Variable(rd.randn(n_in,n_hidden) / np.sqrt(n_in),trainable=True)
@@ -94,8 +106,8 @@ cross_entropy = tf.reduce_mean(-tf.reduce_sum(z_ * tf.log(z), reduction_indices=
 
 # In[23]:
 
-
-train_step = tf.train.GradientDescentOptimizer(0.1).minimize(cross_entropy)
+#argument is learning rate
+train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
 
 
 # To evaluate the performance in a readable way, we also compute the classification accuracy.
@@ -136,24 +148,37 @@ X_batch_list = np.array_split(X,k_batch)
 labels_batch_list = np.array_split(C,k_batch)
 train_acc_final=0
 test_acc_final=0
+final_test_eval = 0
 epochs=0
-
-for k in range(50):
+iterations = 50
+if final:
+    iterations = int(sys.argv[2])
+for k in range(iterations):
     # Run gradient steps over each minibatch
     for x_minibatch,labels_minibatch in zip(X_batch_list,labels_batch_list):
         sess.run(train_step, feed_dict={x: x_minibatch, z_:labels_minibatch})
 
-    # Compute the errors over the whole dataset
     train_loss = sess.run(cross_entropy, feed_dict={x:X, z_:C})
-    test_loss = sess.run(cross_entropy, feed_dict={x:X_tst, z_:C_tst})
-
-    # Compute the acc over the whole dataset
     train_acc = sess.run(accuracy, feed_dict={x:X, z_:C})
-    test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
-    if test_acc > test_acc_final:
+
+    test_loss = 0
+    test_acc = 0
+    if final:
+        test_loss = sess.run(cross_entropy, feed_dict={x:X_tst, z_:C_tst})
+        test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
+    else:
+        test_loss = sess.run(cross_entropy, feed_dict={x:Val_set, z_:Val_set_tar})
+        test_acc = sess.run(accuracy, feed_dict={x:Val_set, z_:Val_set_tar})
+
+    #test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
+
+
+
+    if test_acc > test_acc_final and not final:
         train_acc_final=train_acc
         test_acc_final=test_acc
         epochs=k
+        final_test_eval = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
 
     # Put it into the lists
     test_loss_list.append(test_loss)
@@ -167,12 +192,22 @@ for k in range(50):
 
 # In[25]:
 
-print("Training error")
-print(train_acc_final)
-print("Validation error")
-print(test_acc_final)
-print("Epochs")
-print(epochs)
+
+
+if not final:
+    print("Training error")
+    print(train_acc_final)
+    print("Validation error")
+    print(test_acc_final)
+    print("Epochs")
+    print(epochs)
+    print("Test set accuracy")
+    print(final_test_eval)
+else:
+    print("Training error")
+    print(train_acc_list[-1])
+    print("Test error")
+    print(test_acc_list[-1])
 
 fig,ax_list = plt.subplots(1,2)
 ax_list[0].plot(train_loss_list, color='blue', label='training', lw=2)

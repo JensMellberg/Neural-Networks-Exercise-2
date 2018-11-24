@@ -1,0 +1,70 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Neural Networks Exercise 2}
+\author{Jens, Mellberg, 11806523\\
+		Group partner: Lassi, Lehtonen xxxxxxx}
+
+\begin{document}
+\maketitle
+
+
+Below is a table consisting of the missclassification rate for various parameter choises. 
+
+
+\begin{center}
+	    \begin{tabular}{ |c|c|c|} 
+ 	        \hline
+	        \textbf{Learning rate } & \textbf{Hidden layers} &\textbf{Missclassification rate} \\
+	        \hline
+	        0.1 & 50 & 0.29\\
+ 	        0.2 & 185 & 0.29\\
+ 	        1.0 & 75 & 0.28\\
+ 	        0.3 & 100 & 0.28\\
+ 	        0.3 & 220 & 0.27\\
+ 	        \hline
+        \end{tabular}
+    \end{center}
+    
+    
+    
+    
+
+\begin{figure}[h]
+\caption{Learning rate: 1.0 Hidden layers: 75}
+\centering
+\includegraphics[width=15cm, height=12cm]{LR10HL75}
+\end{figure}
+
+\begin{figure}[h]
+\caption{Learning rate: 0.3 Hidden layers: 220}
+\centering
+\includegraphics[width=15cm, height=12cm]{LR03HL220}
+\end{figure}
+
+As we see in the table and from the figures, most paramater values seem to gravitate towards an accuracy of about 0.7 (even with learning rate set to 1.0). This happens fairly quickly for all configurations and they seem to not be able to escape that local minima. (Note that what is plotted in the graphs is the verification errors and not the test errors. Which is why it does not fully match with the corresponding missclassification rate)\\\\\\
+
+
+
+\begin{figure}[h]
+\caption{Final traning on full set. Learning rate: 0.3 Hidden layers: 220 Epochs: 38}
+\centering
+\includegraphics[width=15cm, height=12cm]{final}
+\end{figure}
+
+The missclassification of the final network configuration resulted in 0.27 (Slightly higher than the 0.27 obtained from the previous attempts). 
+
+
+
+\end{document}
