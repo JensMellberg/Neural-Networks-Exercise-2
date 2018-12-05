@@ -65,20 +65,18 @@ C_tst = C_matrix_test
 
 # In[3]:
 
-for i in range(9):
-    print(i)
 
 
 # Give the dimension of the data and chose the number of hidden layer
 n_in = 300
 n_out = 26
 n_hidden = 40
-learning_rate = 0.3
+learning_rate = 0.001
 
 # Set the variables
 
-W_hid = [0] * 9
-b_hid = [0] * 9
+W_hid = [tf.Variable(0, trainable=True)] * 9
+b_hid = [tf.Variable(0, trainable=True)] * 9
 for i in range(9):
     W_hid[i] = tf.Variable(rd.randn(n_hidden,n_hidden) / np.sqrt(n_in),trainable=True)
     b_hid = tf.Variable(np.zeros(n_hidden),trainable=True)
@@ -90,10 +88,10 @@ b_out = tf.Variable(np.zeros(n_out))
 
 # Define the neuron operations
 x = tf.placeholder(shape=(None,300),dtype=tf.float64)
-y = [0] * 9
-y[0] = (tf.nn.tanh(tf.matmul(x,W_hid[0]) + b_hid[0]))
+y =[tf.Variable(0, trainable=True)] * 9
+y[0] = tf.nn.relu(tf.matmul(x,W_hid[0]) + b_hid[0])
 for i in range(1,9):
-    y[i] = (tf.nn.tanh(tf.matmul(y[i-1],W_hid[i]) + b_hid[i]))
+    y[i] = tf.nn.relu(tf.matmul(y[i-1],W_hid[i]) + b_hid[i])
 z = tf.nn.softmax(tf.matmul(y[8],w_out) + b_out)
 
 
@@ -113,7 +111,7 @@ cross_entropy = tf.reduce_mean(-tf.reduce_sum(z_ * tf.log(z), reduction_indices=
 # In[23]:
 
 #argument is learning rate
-train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(learning_rate, 0.9, 0.999, 0.00000001).minimize(cross_entropy)
 
 
 # To evaluate the performance in a readable way, we also compute the classification accuracy.
@@ -149,14 +147,14 @@ test_acc_list = []
 train_acc_list = []
 
 # Create minibatches to train faster
-k_batch = 40
+k_batch = 20
 X_batch_list = np.array_split(X,k_batch)
 labels_batch_list = np.array_split(C,k_batch)
 train_acc_final=0
 test_acc_final=0
 final_test_eval = 0
 epochs=0
-iterations = 50
+iterations = 500
 
 for k in range(iterations):
     # Run gradient steps over each minibatch
@@ -174,12 +172,10 @@ for k in range(iterations):
     #test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
 
 
-
     if test_acc > test_acc_final:
         train_acc_final=train_acc
         test_acc_final=test_acc
         epochs=k
-        final_test_eval = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
 
     # Put it into the lists
     test_loss_list.append(test_loss)
@@ -197,12 +193,10 @@ for k in range(iterations):
 
 print("Training error")
 print(train_acc_final)
-print("Validation error")
+print("Test error")
 print(test_acc_final)
 print("Epochs")
 print(epochs)
-print("Test set accuracy")
-print(final_test_eval)
 
 fig,ax_list = plt.subplots(1,2)
 ax_list[0].plot(train_loss_list, color='blue', label='training', lw=2)
