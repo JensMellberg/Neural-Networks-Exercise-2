@@ -44,7 +44,7 @@ for i in range(X.shape[0]):
 for i in range(X_tst.shape[0]):
     mean = np.mean(X_tst[i,:])
     std = np.std(X_tst[i,:])
-    for f in range(X.shape[1]):
+    for f in range(X_tst.shape[1]):
         X_tst[i,f] = (X_tst[i,f] - mean)/std
 #print(np.std(X[1,:]))
 #print(np.std(X[5,:]))
@@ -56,7 +56,6 @@ for x in range(6238):
 C_matrix_test = np.zeros((1559,26))
 for x in range(1559):
     C_matrix_test[x,C_tst[x]-1] = 1
-print(X.shape)
 
 C = C_matrix
 C_tst = C_matrix_test
@@ -65,36 +64,37 @@ C_tst = C_matrix_test
 # - x is a matrix and not a vector, is has shape [None,784]. The first dimension correspond to a **batch size**. Multiplying larger matrices is usually faster that multiplying small ones many times, using minibatches allows to process many images in a single matrix multiplication.
 
 # In[3]:
-final = False
-if len(sys.argv) > 1 and sys.argv[1] == "final":
-    final = True
 
-if not final:
-    Val_set = X[0:1247,:]
-    Val_set_tar = C[0:1247,:]
-
-    X = X[1247:,:]
-    C = C[1247:,:]
-
+for i in range(9):
+    print(i)
 
 
 # Give the dimension of the data and chose the number of hidden layer
 n_in = 300
 n_out = 26
-n_hidden = 220
+n_hidden = 40
 learning_rate = 0.3
 
 # Set the variables
-W_hid = tf.Variable(rd.randn(n_in,n_hidden) / np.sqrt(n_in),trainable=True)
-b_hid = tf.Variable(np.zeros(n_hidden),trainable=True)
+
+W_hid = [0] * 9
+b_hid = [0] * 9
+for i in range(9):
+    W_hid[i] = tf.Variable(rd.randn(n_hidden,n_hidden) / np.sqrt(n_in),trainable=True)
+    b_hid = tf.Variable(np.zeros(n_hidden),trainable=True)
+
+W_hid[0] = tf.Variable(rd.randn(n_in,n_hidden) / np.sqrt(n_in),trainable=True)
 
 w_out = tf.Variable(rd.randn(n_hidden,n_out) / np.sqrt(n_in),trainable=True)
 b_out = tf.Variable(np.zeros(n_out))
 
 # Define the neuron operations
 x = tf.placeholder(shape=(None,300),dtype=tf.float64)
-y = tf.nn.tanh(tf.matmul(x,W_hid) + b_hid)
-z = tf.nn.softmax(tf.matmul(y,w_out) + b_out)
+y = [0] * 9
+y[0] = (tf.nn.tanh(tf.matmul(x,W_hid[0]) + b_hid[0]))
+for i in range(1,9):
+    y[i] = (tf.nn.tanh(tf.matmul(y[i-1],W_hid[i]) + b_hid[i]))
+z = tf.nn.softmax(tf.matmul(y[8],w_out) + b_out)
 
 
 # Define the loss as the cross entropy: $ - \sum y \log y'$
@@ -157,8 +157,7 @@ test_acc_final=0
 final_test_eval = 0
 epochs=0
 iterations = 50
-if final:
-    iterations = int(sys.argv[2])
+
 for k in range(iterations):
     # Run gradient steps over each minibatch
     for x_minibatch,labels_minibatch in zip(X_batch_list,labels_batch_list):
@@ -169,18 +168,14 @@ for k in range(iterations):
 
     test_loss = 0
     test_acc = 0
-    if final:
-        test_loss = sess.run(cross_entropy, feed_dict={x:X_tst, z_:C_tst})
-        test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
-    else:
-        test_loss = sess.run(cross_entropy, feed_dict={x:Val_set, z_:Val_set_tar})
-        test_acc = sess.run(accuracy, feed_dict={x:Val_set, z_:Val_set_tar})
+    test_loss = sess.run(cross_entropy, feed_dict={x:X_tst, z_:C_tst})
+    test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
 
     #test_acc = sess.run(accuracy, feed_dict={x:X_tst, z_:C_tst})
 
 
 
-    if test_acc > test_acc_final and not final:
+    if test_acc > test_acc_final:
         train_acc_final=train_acc
         test_acc_final=test_acc
         epochs=k
@@ -200,20 +195,14 @@ for k in range(iterations):
 
 
 
-if not final:
-    print("Training error")
-    print(train_acc_final)
-    print("Validation error")
-    print(test_acc_final)
-    print("Epochs")
-    print(epochs)
-    print("Test set accuracy")
-    print(final_test_eval)
-else:
-    print("Training error")
-    print(train_acc_list[-1])
-    print("Test error")
-    print(test_acc_list[-1])
+print("Training error")
+print(train_acc_final)
+print("Validation error")
+print(test_acc_final)
+print("Epochs")
+print(epochs)
+print("Test set accuracy")
+print(final_test_eval)
 
 fig,ax_list = plt.subplots(1,2)
 ax_list[0].plot(train_loss_list, color='blue', label='training', lw=2)
