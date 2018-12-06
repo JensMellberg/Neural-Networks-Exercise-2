@@ -35,6 +35,10 @@ from tensorflow.examples.tutorials.mnist import input_data
 #print(np.mean(X[1,:]))
 #print(np.std(X[1,:]))
 #
+res = False
+if len(sys.argv) > 1 and sys.argv[1] == "res":
+    res = True
+
 for i in range(X.shape[0]):
     mean = np.mean(X[i,:])
     std = np.std(X[i,:])
@@ -71,15 +75,16 @@ C_tst = C_matrix_test
 n_in = 300
 n_out = 26
 n_hidden = 40
-learning_rate = 0.001
+learning_rate = 0.00001
+layers = 9
 
 # Set the variables
 
-W_hid = [tf.Variable(0, trainable=True)] * 9
-b_hid = [tf.Variable(0, trainable=True)] * 9
-for i in range(9):
-    W_hid[i] = tf.Variable(rd.randn(n_hidden,n_hidden) / np.sqrt(n_in),trainable=True)
-    b_hid = tf.Variable(np.zeros(n_hidden),trainable=True)
+W_hid = []
+b_hid = []
+for i in range(layers):
+    W_hid.append(tf.Variable(rd.randn(n_hidden,n_hidden) / np.sqrt(n_in),trainable=True))
+    b_hid.append(tf.Variable(np.zeros(n_hidden),trainable=True))
 
 W_hid[0] = tf.Variable(rd.randn(n_in,n_hidden) / np.sqrt(n_in),trainable=True)
 
@@ -88,11 +93,16 @@ b_out = tf.Variable(np.zeros(n_out))
 
 # Define the neuron operations
 x = tf.placeholder(shape=(None,300),dtype=tf.float64)
-y =[tf.Variable(0, trainable=True)] * 9
-y[0] = tf.nn.relu(tf.matmul(x,W_hid[0]) + b_hid[0])
-for i in range(1,9):
-    y[i] = tf.nn.relu(tf.matmul(y[i-1],W_hid[i]) + b_hid[i])
-z = tf.nn.softmax(tf.matmul(y[8],w_out) + b_out)
+z = 0
+y =[]
+y.append(tf.nn.relu(tf.matmul(x,W_hid[0]) + b_hid[0]))
+if res:
+    for i in range(1,layers/2):
+        exit()
+else:
+    for i in range(1,layers):
+        y.append(tf.nn.relu(tf.matmul(y[i-1],W_hid[i]) + b_hid[i]))
+    z = tf.nn.softmax(tf.matmul(y[layers-1],w_out) + b_out)
 
 
 # Define the loss as the cross entropy: $ - \sum y \log y'$
