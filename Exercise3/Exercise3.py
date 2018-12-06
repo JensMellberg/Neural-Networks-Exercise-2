@@ -75,7 +75,7 @@ C_tst = C_matrix_test
 n_in = 300
 n_out = 26
 n_hidden = 40
-learning_rate = 0.00001
+learning_rate = 0.001
 layers = 9
 
 # Set the variables
@@ -97,8 +97,15 @@ z = 0
 y =[]
 y.append(tf.nn.relu(tf.matmul(x,W_hid[0]) + b_hid[0]))
 if res:
-    for i in range(1,layers/2):
-        exit()
+    relu1 = tf.nn.relu(tf.matmul( y[0], W_hid[1]) + b_hid[1])
+    y.append(tf.nn.relu(y[0] + tf.matmul( relu1,W_hid[2]) + b_hid[2]))
+    relu2 = tf.nn.relu(tf.matmul(y[1], W_hid[3]) + b_hid[3])
+    y.append(tf.nn.relu(y[1] + tf.matmul(relu2, W_hid[4]) + b_hid[4]))
+    relu3 = tf.nn.relu(tf.matmul( y[2], W_hid[5]) + b_hid[5])
+    y.append(tf.nn.relu(y[2] + tf.matmul(relu3, W_hid[6]) + b_hid[6]))
+    relu4 = tf.nn.relu(tf.matmul(y[3], W_hid[7]) + b_hid[7])
+    y.append(tf.nn.relu(y[3] + tf.matmul(relu4, W_hid[8] ) + b_hid[8]))
+    z = tf.nn.softmax(tf.matmul(y[4],w_out) + b_out)
 else:
     for i in range(1,layers):
         y.append(tf.nn.relu(tf.matmul(y[i-1],W_hid[i]) + b_hid[i]))
@@ -164,7 +171,7 @@ train_acc_final=0
 test_acc_final=0
 final_test_eval = 0
 epochs=0
-iterations = 500
+iterations = 2500
 
 for k in range(iterations):
     # Run gradient steps over each minibatch
