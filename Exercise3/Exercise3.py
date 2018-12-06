@@ -164,7 +164,7 @@ train_acc_final=0
 test_acc_final=0
 final_test_eval = 0
 epochs=0
-iterations = 300
+iterations = 500
 
 for k in range(iterations):
     # Run gradient steps over each minibatch
