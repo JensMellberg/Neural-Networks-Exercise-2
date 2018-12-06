@@ -75,9 +75,9 @@ learning_rate = 0.00001
 
 # Set the variables
 
-W_hid = [tf.Variable(0, trainable=True)] * 9
-b_hid = [tf.Variable(0, trainable=True)] * 9
-for i in range(9):
+W_hid = [tf.Variable(0, trainable=True)] * 5
+b_hid = [tf.Variable(0, trainable=True)] * 5
+for i in range(5):
     W_hid[i] = tf.Variable(rd.randn(n_hidden,n_hidden) / np.sqrt(n_in),trainable=True)
     b_hid = tf.Variable(np.zeros(n_hidden),trainable=True)
 
@@ -88,11 +88,11 @@ b_out = tf.Variable(np.zeros(n_out))
 
 # Define the neuron operations
 x = tf.placeholder(shape=(None,300),dtype=tf.float64)
-y =[tf.Variable(0, trainable=True)] * 9
+y =[tf.Variable(0, trainable=True)] * 5
 y[0] = tf.nn.relu(tf.matmul(x,W_hid[0]) + b_hid[0])
-for i in range(1,9):
+for i in range(1,5):
     y[i] = tf.nn.relu(tf.matmul(y[i-1],W_hid[i]) + b_hid[i])
-z = tf.nn.softmax(tf.matmul(y[8],w_out) + b_out)
+z = tf.nn.softmax(tf.matmul(y[4],w_out) + b_out)
 
 
 # Define the loss as the cross entropy: $ - \sum y \log y'$
@@ -154,7 +154,7 @@ train_acc_final=0
 test_acc_final=0
 final_test_eval = 0
 epochs=0
-iterations = 300
+iterations = 500
 
 for k in range(iterations):
     # Run gradient steps over each minibatch
