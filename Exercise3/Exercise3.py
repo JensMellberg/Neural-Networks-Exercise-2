@@ -75,7 +75,7 @@ C_tst = C_matrix_test
 n_in = 300
 n_out = 26
 n_hidden = 40
-learning_rate = 0.001
+learning_rate = 0.0001
 layers = 9
 
 # Set the variables
@@ -171,7 +171,7 @@ train_acc_final=0
 test_acc_final=0
 final_test_eval = 0
 epochs=0
-iterations = 2500
+iterations = 500
 
 for k in range(iterations):
     # Run gradient steps over each minibatch
