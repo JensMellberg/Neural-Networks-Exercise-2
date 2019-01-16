@@ -23,12 +23,21 @@ def generate_data(nbr_of_examples):
         fullTar = np.zeros((50,7))
         fullVec[:-(50-vec.shape[0]),:] = vec
         fullTar[:-(50-vec.shape[0]),:] = tar
-        print(vec.shape)
-        print(fullVec.shape)
         examples[i] = fullVec
         targets[i] = fullTar
 
     return examples, targets, sl
+
+
+def generate_data2(nbr_of_examples):
+    words = [ make_embedded_reber() for i in range(nbr_of_examples) ]
+    max_len = len(max(words,key=len))
+    sl, words_one_hot, next_chars_one_hot = zip(*[ \
+        (len(i) ,\
+        np.pad(str_to_vec(i),((0,max_len-len(i)),(0,0)),mode='constant'), \
+        np.pad(str_to_next_embed(i),((0,max_len-len(i)),(0,0)),mode='constant')) \
+        for i in words ])
+    return words_one_hot, next_chars_one_hot, sl, max_len
 
 
 tf.reset_default_graph()  # for iPython convenience
@@ -51,23 +60,25 @@ max_epoch = 200
 # ----------------------------------------------------------------------
 
 # Generate delayed XOR samples
-X_train, y_train, sl_train = generate_data(num_train)
+X_train, y_train, sl_train, ml = generate_data2(num_train)
+sequence_length = ml
 
-X_valid, y_valid, sl_valid = generate_data(num_valid)
+X_valid, y_valid, sl_valid, _ = generate_data2(num_valid)
 
-X_test, y_test, sl_test = generate_data(num_test)
+X_test, y_test, sl_test, _ = generate_data2(num_test)
 
 
+#X_train = tf.reshape(X_traSF in, [-1, num_train]) #added very probably wrong
 # placeholder for the sequence length of the examples
 seq_length = tf.placeholder(tf.int32, [None])
 
 # input tensor shape: number of examples, input length, dimensionality of each input
 # at every time step, one bit is shown to the network
-X = tf.placeholder(tf.float32, [None, sequence_length, 7])
+X = tf.placeholder(tf.float32, [None, sequence_length, 7]) #,
 
 # output tensor shape: number of examples, dimensionality of each output
 # Binary output at end of sequence
-y = tf.placeholder(tf.float32, [None, 7])
+y = tf.placeholder(tf.float32, [None, 7]) #[None, 1]
 
 # define recurrent layer
 if cell_type == 'simple':
@@ -115,7 +126,7 @@ sess.run(tf.global_variables_initializer())
 
 # split data into batches
 
-num_batches = int(X_train.shape[0] / batch_size)
+num_batches = int(len(X_train) / batch_size)
 X_train_batches = np.array_split(X_train, num_batches)
 y_train_batches = np.array_split(y_train, num_batches)
 sl_train_batches = np.array_split(sl_train, num_batches)
