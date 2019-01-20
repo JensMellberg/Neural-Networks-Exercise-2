@@ -60,14 +60,11 @@ num_hidden = 14
 
 
 batch_size = 40
-learning_rate = 0.0001
+learning_rate = 0.0025
 
 
 max_epoch = 50
 
-#Best so far for AdamOptimizer
-#LR: 0.00035
-#Ba: 40
 
 # ----------------------------------------------------------------------
 

@@ -5,3 +5,12 @@ We find that adjusting the batch size does not improve the performance of our ne
 However, increasing the learning rate by small increments seems to improve the performance and decrease the convergence time.
 As seen in the plots, the convergence time decreases and we find our optimal performance when the learning rate is 0.00035.
 Increasing the learning rate more, the performance of our network will decrease.
+We conclude that the optimal learning rate for our network is 0.00035 with the batch size of 40.
+
+
+Training the same LSTM, but now with ADAM
+
+Our training begins with a learning rate of 0.0001 and default values for other parameters.
+As seen in the plots, it requires 45 epochs for convergence. We proceed by increasing the learning rate gradually.
+The evolution of the training/validation error is depicted in the provided plots. We reach a good performance at learning rate 0.0025.
+We perform our ten learning runs with these parameters.
