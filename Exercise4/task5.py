@@ -60,7 +60,8 @@ num_hidden = 14
 
 
 batch_size = 40
-learning_rate = 0.0006
+learning_rate = 0.0001
+
 
 max_epoch = 50
 
@@ -149,8 +150,8 @@ cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=outputs, labels=y
 #From newsgroup
 #cross_entropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=outputs, labels=y))
 
-train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
-#train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
+#train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
 mistakes = tf.not_equal(y, tf.maximum(tf.sign(outputs), 0))
 error = tf.reduce_mean(tf.cast(mistakes, tf.float32))
