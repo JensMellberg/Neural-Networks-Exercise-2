@@ -1,0 +1,7 @@
+Training an LSTM with one hidden layer
+
+We begin the training with a learning rate of 0.0001 and batch size 40.
+We find that adjusting the batch size does not improve the performance of our network, so we let the batch size remain 40.
+However, increasing the learning rate by small increments seems to improve the performance and decrease the convergence time.
+As seen in the plots, the convergence time decreases and we find our optimal performance when the learning rate is 0.00035.
+Increasing the learning rate more, the performance of our network will decrease.

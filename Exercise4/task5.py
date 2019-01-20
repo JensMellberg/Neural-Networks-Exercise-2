@@ -22,7 +22,6 @@ def generate_data(nbr_of_examples):
     targets = np.ones((nbr_of_examples,max_len,7))
 
     for i in range(nbr_of_examples):
-
         sl[i] = len(current_string)
         vec = str_to_vec(current_string)
         tar = str_to_next_embed(current_string)
@@ -59,9 +58,15 @@ num_train, num_valid, num_test = 5000, 500, 500
 cell_type = 'lstm'
 num_hidden = 14
 
+
 batch_size = 40
-learning_rate = 0.0001
-max_epoch = 200
+learning_rate = 0.0006
+
+max_epoch = 50
+
+#Best so far for AdamOptimizer
+#LR: 0.00035
+#Ba: 40
 
 # ----------------------------------------------------------------------
 
@@ -90,7 +95,6 @@ X_test, y_test, sl_test, ml = generate_data(num_test)
 sequence_length = max(sequence_length, ml)"""
 
 
-#X_train = tf.reshape(X_traSF in, [-1, num_train]) #added very probably wrong
 # placeholder for the sequence length of the examples
 seq_length = tf.placeholder(tf.int32, [None])
 
@@ -141,7 +145,12 @@ print(outputs)
 
 # define loss, minimizer and error
 cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=outputs, labels=y)
+
+#From newsgroup
+#cross_entropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=outputs, labels=y))
+
 train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+#train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
 mistakes = tf.not_equal(y, tf.maximum(tf.sign(outputs), 0))
 error = tf.reduce_mean(tf.cast(mistakes, tf.float32))
